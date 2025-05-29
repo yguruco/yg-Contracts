@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "lib/openzeppelin-contracts/contracts/access/AccessControl.sol";
+
 import "../structs/PositionInfo.sol";
 import "../structs/YieldStruct.sol";
 import "../constants/Roles.sol";
@@ -62,7 +63,8 @@ contract Position is ERC721Enumerable, AccessControl, IPosition {
             amount: amount,
             timestamp: block.timestamp,
             withdrawn: false,
-            yieldParams: yieldParams
+            yieldParams: yieldParams,
+            tokenAddress: tokenAddress
         });
         
         return tokenId;

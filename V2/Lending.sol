@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import "lib/openzeppelin-contracts/contracts/access/AccessControl.sol";
+import "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 import "./helpers/Position.sol";
 import "./helpers/YieldGuruInterest.sol";
 import "./helpers/WithdrawalHelper.sol";
@@ -86,7 +86,7 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
         uint256 compoundingFrequency
     ) external override onlyRole(Roles.ADMIN_ROLE) returns (uint256) {
         if (tokenAddress != USDC && tokenAddress != GWANDALAND)
-            revert InvalidToken();
+            revert InvalidToken(tokenAddress);
         if (totalAmount == 0) revert ZeroAmount();
         if (interestRate == 0) revert InvalidRate();
         if (loanDuration == 0) revert InvalidLoanDuration();
@@ -117,16 +117,11 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
             tokenAddress,
             totalAmount,
             interestRate,
-            loanDuration
+            compoundingFrequency,
+            loanDuration,
+            block.timestamp
         );
         
-        // Emit initial funding status
-        emit Events.LoanFundingUpdated(
-            loanId,
-            0,
-            totalAmount,
-            0
-        );
         
         return loanId;
     }
@@ -168,16 +163,9 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
         loan.totalInvested += amount;
         loan.lastUpdateTime = block.timestamp;
 
-        // Calculate funding percentage
-        uint256 fundingPercentage = loan.fundingPercentage();
+        // // Calculate funding percentage
+        // uint256 fundingPercentage = loan.fundingPercentage();
 
-        // Emit funding status update
-        emit Events.LoanFundingUpdated(
-            loanId,
-            loan.currentAmount,
-            loan.totalAmount,
-            fundingPercentage
-        );
 
         // Check if funding threshold reached
         if (loan.hasReachedFundingThreshold() && loan.state == LoanState.Active) {
@@ -185,13 +173,13 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
             loan.startTime = block.timestamp;
             loan.endTime = block.timestamp + loan.loanDuration;
             
-            emit Events.LoanFunded(loanId, loan.currentAmount);
+            emit Events.LoanFunded(loanId, loan.currentAmount, block.timestamp);
         }
         
-        // Check if loan is now fully funded
-        if (loan.isFullyFunded() && fundingPercentage == 100) {
-            emit Events.LoanFullyFunded(loanId, loan.currentAmount, block.timestamp);
-        }
+        // // Check if loan is now fully funded
+        // if (loan.isFullyFunded() && fundingPercentage == 100) {
+        //     emit Events.LoanFullyFunded(loanId, loan.currentAmount, block.timestamp);
+        // }
 
         // Calculate expected interest by creating YieldStruct
         YieldStruct memory yieldParams = YieldStruct({
@@ -231,7 +219,7 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
         
         loan.withdrawalRecipient = recipient;
         
-        emit Events.WithdrawalAuthorized(loanId, msg.sender, recipient);
+        emit Events.WithdrawalAuthorized(loanId, msg.sender, recipient, block.timestamp);
     }
 
     /**
@@ -269,15 +257,15 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
         // Transfer funds to the recipient
         IERC20(loan.tokenAddress).safeTransfer(loan.withdrawalRecipient, withdrawAmount);
         
-        // Update loan status
-        emit Events.LoanFundingUpdated(
-            loanId,
-            loan.currentAmount,
-            loan.totalAmount,
-            loan.fundingPercentage()
-        );
+        // // Update loan status
+        // emit Events.LoanFundingUpdated(
+        //     loanId,
+        //     loan.currentAmount,
+        //     loan.totalAmount,
+        //     loan.fundingPercentage()
+        // );
         
-        emit Events.FundsWithdrawn(loanId, loan.withdrawalRecipient, withdrawAmount);
+        // emit Events.FundsWithdrawn(loanId, loan.withdrawalRecipient, withdrawAmount);
         
         return withdrawAmount;
     }
@@ -311,7 +299,7 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
         loan.state = LoanState.Repaid;
         loan.lastUpdateTime = block.timestamp;
 
-        emit Events.LoanRepaid(loanId, totalRepayment);
+        emit Events.LoanRepaid(loanId, totalRepayment, block.timestamp);
         
         // Emit settlement status update
         emit Events.LoanSettlementStatusChanged(
@@ -341,7 +329,7 @@ contract Lending is AccessControl, ReentrancyGuard, ILending {
         loan.state = LoanState.Defaulted;
         loan.lastUpdateTime = block.timestamp;
 
-        emit Events.LoanDefaulted(loanId);
+        emit Events.LoanDefaulted(loanId, block.timestamp);
         
         // Emit settlement status update
         emit Events.LoanSettlementStatusChanged(

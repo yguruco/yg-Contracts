@@ -24,7 +24,7 @@ This repository contains the smart contracts powering the YieldGuru protocol.
 - The `V2` contracts are **in active development**.
 - **Code is not tested** and **should not be used in production**.
 - Expect breaking changes and frequent updates as development progresses.
-
+- For now ignore the examples folder 
 ##  Status
 
 > The project is evolving rapidly. Contributions, suggestions, and feedback are welcome.

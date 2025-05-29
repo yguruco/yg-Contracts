@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
+import "../structs/LoanState.sol";
 
 /**
  * @title Events
@@ -108,5 +109,29 @@ library Events {
         address indexed sender,
         address recipient,
         uint256 timestamp
+    );
+
+    event FundingSummaryLogged(
+        uint256 indexed loanId,
+        uint256 totalAmount,
+        uint256 currentAmount,
+        uint256 remainingAmount,
+        uint256 percentageFunded
+    );
+
+    event SettlementStatusLogged(
+        uint256 indexed loanId,
+        LoanState state,
+        bool isSettled,
+        bool canBeWithdrawn,
+        bool hasBeenWithdrawn
+    );
+
+    event FundingHistoryLogged(
+        uint256 indexed loanId,
+        uint256 totalInvested,
+        uint256 currentAmount,
+        uint256 withdrawnAmount,
+        uint256 lastUpdateTime
     );
 } 

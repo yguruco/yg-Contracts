@@ -6,7 +6,7 @@ pragma solidity ^0.8.29;
  * @dev Contains address constants for tokens used in the system
  */
 library TokenAddresses {
-    // Gwandaland token address
+    // YG Mock  token address
     address public constant GWANDALAND = 0xcC1B2424Ed2381D013dDb2e0635cAC9bc9aE9864;
     
     // USDC token address

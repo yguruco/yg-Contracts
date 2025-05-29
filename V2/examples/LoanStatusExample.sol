@@ -3,6 +3,7 @@ pragma solidity ^0.8.29;
 
 import "../Lending.sol";
 import "../structs/LoanState.sol";
+import "../constants/Events.sol";
 
 /**
  * @title LoanStatusExample
@@ -11,32 +12,7 @@ import "../structs/LoanState.sol";
 contract LoanStatusExample {
     Lending public lendingContract;
     
-    // Event to log funding summary
-    event FundingSummaryLogged(
-        uint256 indexed loanId,
-        uint256 totalAmount,
-        uint256 currentAmount,
-        uint256 remainingAmount,
-        uint256 percentageFunded
-    );
-    
-    // Event to log settlement status
-    event SettlementStatusLogged(
-        uint256 indexed loanId,
-        LoanState state,
-        bool isSettled,
-        bool canBeWithdrawn,
-        bool hasBeenWithdrawn
-    );
-    
-    // Event to log funding history
-    event FundingHistoryLogged(
-        uint256 indexed loanId,
-        uint256 totalInvested,
-        uint256 currentAmount,
-        uint256 withdrawnAmount,
-        uint256 lastUpdateTime
-    );
+
     
     constructor(address lendingContractAddress) {
         lendingContract = Lending(lendingContractAddress);
@@ -58,7 +34,7 @@ contract LoanStatusExample {
         ) = lendingContract.getLoanFundingStatus(loanId);
         
         // Log the funding summary
-        emit FundingSummaryLogged(
+        emit Events.FundingSummaryLogged(
             loanId,
             totalAmount,
             currentAmount,
@@ -96,7 +72,7 @@ contract LoanStatusExample {
         ) = lendingContract.getLoanSettlementStatus(loanId);
         
         // Log the settlement status
-        emit SettlementStatusLogged(
+        emit Events.SettlementStatusLogged(
             loanId,
             state,
             isSettled,
@@ -133,7 +109,7 @@ contract LoanStatusExample {
         ) = lendingContract.getLoanFundingHistory(loanId);
         
         // Log the funding history
-        emit FundingHistoryLogged(
+        emit Events.FundingHistoryLogged(
             loanId,
             totalInvested,
             currentAmount,

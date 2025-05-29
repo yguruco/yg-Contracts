@@ -77,4 +77,6 @@ error UnauthorizedWithdrawalRecipient();
 
 error UnsupportedToken(address token);
 error ContractNotActive();
-
+error InvalidRate();
+error InvalidLoanDuration();
+error WithdrawalToZeroAddress();

@@ -10,5 +10,6 @@ enum LoanState {
     Funded,     // Loan has reached funding threshold and is active
     Repaid,     // Loan has been repaid with interest
     Defaulted,  // Loan has expired without being repaid
-    Cancelled   // Loan was cancelled before funding completed
+    Cancelled ,  // Loan was cancelled before funding completed
+    Active
 } 
